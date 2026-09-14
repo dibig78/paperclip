@@ -1,0 +1,67 @@
+import os from "node:os";
+import { eq } from "drizzle-orm";
+import { agents, heartbeatRuns, type Db } from "@paperclipai/db";
+import { captureRunFailure, type RunFailureStatus } from "../sentry.js";
+import { redactCurrentUserText } from "../log-redaction.js";
+import { loadConfig } from "../config.js";
+import { logger } from "../middleware/logger.js";
+
+type HeartbeatRun = typeof heartbeatRuns.$inferSelect;
+
+const UNKNOWN_ADAPTER = "unknown";
+
+/**
+ * The Paperclip instance value a Sentry event carries. Resolved once, at
+ * module load: the operator's public base URL when set, else the host
+ * name. `config.host` is never a candidate — it can be a bind address such
+ * as `0.0.0.0`.
+ */
+const RUN_FAILURE_INSTANCE = loadConfig().authPublicBaseUrl ?? os.hostname();
+
+function isRunFailureStatus(status: string): status is RunFailureStatus {
+  return status === "failed" || status === "timed_out";
+}
+
+function readTaskId(run: HeartbeatRun): string | null {
+  if (run.nativeIssueId) return run.nativeIssueId;
+  const contextIssueId = run.contextSnapshot?.issueId;
+  return typeof contextIssueId === "string" && contextIssueId.length > 0 ? contextIssueId : null;
+}
+
+/**
+ * Report a terminal run failure to Sentry. Returns at once for any status
+ * other than `failed` and `timed_out`. Never throws — a Sentry failure or a
+ * database read failure must not change the caller's control flow.
+ *
+ * Call this beside the caller's own terminal-status write, with
+ * `void reportRunFailure(db, run)`. Do not await it — a Sentry read must
+ * not delay the caller's own required lifecycle work.
+ */
+export async function reportRunFailure(db: Db, run: HeartbeatRun): Promise<void> {
+  if (!isRunFailureStatus(run.status)) return;
+  try {
+    const agent = await db
+      .select({ adapterType: agents.adapterType })
+      .from(agents)
+      .where(eq(agents.id, run.agentId))
+      .then((rows) => rows[0] ?? null);
+
+    const taskId = readTaskId(run);
+    if (!taskId) {
+      logger.warn({ runId: run.id }, "run failure report has no task id, skipping Sentry report");
+      return;
+    }
+
+    captureRunFailure({
+      instance: RUN_FAILURE_INSTANCE,
+      taskId,
+      runId: run.id,
+      errorMessage: redactCurrentUserText(run.error ?? ""),
+      errorCode: run.errorCode,
+      agentAdapter: agent?.adapterType ?? UNKNOWN_ADAPTER,
+      runStatus: run.status,
+    });
+  } catch (err) {
+    logger.warn({ err, runId: run.id }, "failed to report run failure to Sentry");
+  }
+}
