@@ -79,6 +79,12 @@ env:
   # next version number is derived from what is already on npm the retry
   # moves to a new number and meets the same lag. Waiting is cheap; a
   # half-published release is not.
+  #
+  # Packages are published and verified one at a time, so the publish jobs'
+  # timeout-minutes went to 150 alongside this: a 30-minute build plus four
+  # packages each lagging the full budget still finishes inside the job,
+  # instead of the job timing out mid-batch and leaving the same
+  # half-published state this budget exists to avoid.
   NPM_PUBLISH_VERIFY_ATTEMPTS: "180"
   NPM_PUBLISH_VERIFY_DELAY_SECONDS: "10"
 
@@ -334,7 +340,7 @@ jobs:
     if: github.event_name == 'push'
     needs: verify_canary
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     environment: npm-canary
     outputs:
       canary_version: ${{ steps.canary_tag.outputs.version }}
@@ -590,7 +596,7 @@ jobs:
       (needs.smoke_nightly.result == 'success' ||
        (needs.smoke_nightly.result == 'skipped' && github.event_name == 'workflow_dispatch' && inputs.dry_run))
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     environment: npm-canary
     # The workflow-level concurrency group is per event, so a forced dispatch
     # nightly could otherwise overlap the scheduled one and race it to the
@@ -856,7 +862,7 @@ jobs:
       (needs.verify_beta_candidate.result == 'success' ||
        (needs.verify_beta_candidate.result == 'skipped' && needs.select_beta.outputs.mode == 'promote'))
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     environment: npm-beta
     # Serialize beta publishes so two dispatches cannot race to the same next
     # -beta.N version; release.sh additionally refuses to double-publish a
@@ -1279,7 +1285,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.channel == 'stable' && !inputs.dry_run
     needs: [preflight_stable, verify_stable]
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     environment: npm-stable
     permissions:
       contents: write
