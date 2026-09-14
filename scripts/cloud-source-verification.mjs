@@ -61,6 +61,45 @@ export async function readSourceVerification(sha, api) {
   return undefined;
 }
 
+// Statuses that say "ask again", not "the answer is no". A release must not be
+// blocked because GitHub returned a gateway error during a 45-minute poll.
+// Everything else — 401, 403, 404 — is a real problem and still fails at once.
+const TRANSIENT_READ_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+/**
+ * The GitHub Actions read used by the polling below, with transient transport
+ * failures retried. Network errors and the statuses above get a few bounded
+ * attempts; any other non-OK status throws on the first response.
+ */
+export function createActionsReader({
+  token, fetchImpl = fetch, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  attempts = 4, backoffMs = 1_000, log = console.log,
+} = {}) {
+  return async (path) => {
+    for (let attempt = 1; ; attempt += 1) {
+      const retryable = attempt < attempts;
+      let response;
+      try {
+        response = await fetchImpl(`https://api.github.com${path}`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+          signal: AbortSignal.timeout(30_000), redirect: "error",
+        });
+      } catch (cause) {
+        if (!retryable) throw new Error(`GitHub Actions read failed: ${cause.message}`);
+        log(`GitHub Actions read failed (${cause.message}); retrying (${attempt}/${attempts - 1}).`);
+        await sleep(backoffMs * attempt);
+        continue;
+      }
+      if (response.ok) return response.json();
+      if (!retryable || !TRANSIENT_READ_STATUSES.has(response.status)) {
+        throw new Error(`GitHub Actions read failed (HTTP ${response.status}).`);
+      }
+      log(`GitHub Actions read failed (HTTP ${response.status}); retrying (${attempt}/${attempts - 1}).`);
+      await sleep(backoffMs * attempt);
+    }
+  };
+}
+
 export async function waitForSourceVerification(sha, {
   api, now = Date.now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   timeoutMs = 45 * 60_000, intervalMs = 30_000, log = console.log,
@@ -80,14 +119,7 @@ export async function waitForSourceVerification(sha, {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     if (!process.env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN with Actions read access is required.");
-    const api = async (path) => {
-      const response = await fetch(`https://api.github.com${path}`, {
-        headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
-        signal: AbortSignal.timeout(30_000), redirect: "error",
-      });
-      if (!response.ok) throw new Error(`GitHub Actions read failed (HTTP ${response.status}).`);
-      return response.json();
-    };
+    const api = createActionsReader({ token: process.env.GITHUB_TOKEN });
     const proof = await waitForSourceVerification(process.argv[2], { api });
     const message = `Source verification passed for ${proof.sha}: https://github.com/${repository}/actions/runs/${proof.runId}/attempts/${proof.attempt} (job ${proof.jobId}).`;
     console.log(message);
