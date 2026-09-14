@@ -10,13 +10,20 @@ type HeartbeatRun = typeof heartbeatRuns.$inferSelect;
 
 const UNKNOWN_ADAPTER = "unknown";
 
+let cachedRunFailureInstance: string | null = null;
+
 /**
- * The Paperclip instance value a Sentry event carries. Resolved once, at
- * module load: the operator's public base URL when set, else the host
- * name. `config.host` is never a candidate — it can be a bind address such
- * as `0.0.0.0`.
+ * Resolve the Paperclip instance value a Sentry event carries. Resolve it
+ * once, on the first call, and return the stored value after that. Use the
+ * operator's public base URL when set, else the host name. `config.host` is
+ * never a candidate — it can be a bind address such as `0.0.0.0`.
  */
-const RUN_FAILURE_INSTANCE = loadConfig().authPublicBaseUrl ?? os.hostname();
+function resolveRunFailureInstance(): string {
+  if (cachedRunFailureInstance === null) {
+    cachedRunFailureInstance = loadConfig().authPublicBaseUrl ?? os.hostname();
+  }
+  return cachedRunFailureInstance;
+}
 
 function isRunFailureStatus(status: string): status is RunFailureStatus {
   return status === "failed" || status === "timed_out";
@@ -53,7 +60,7 @@ export async function reportRunFailure(db: Db, run: HeartbeatRun): Promise<void>
     }
 
     captureRunFailure({
-      instance: RUN_FAILURE_INSTANCE,
+      instance: resolveRunFailureInstance(),
       taskId,
       runId: run.id,
       errorMessage: redactCurrentUserText(run.error ?? ""),

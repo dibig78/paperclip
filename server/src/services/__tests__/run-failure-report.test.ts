@@ -224,4 +224,42 @@ describeEmbeddedPostgres("reportRunFailure", () => {
       expect.objectContaining({ instance: os.hostname() }),
     );
   });
+
+  it("does not call loadConfig on import", async () => {
+    mockLoadConfig.mockImplementation(() => {
+      throw new Error("bind configuration is invalid");
+    });
+    vi.resetModules();
+
+    await expect(import("../run-failure-report.js")).resolves.toBeDefined();
+    expect(mockLoadConfig).not.toHaveBeenCalled();
+  });
+
+  it("does not throw and logs a warning when loadConfig throws", async () => {
+    await seedCompanyAndAgent();
+    mockLoadConfig.mockImplementation(() => {
+      throw new Error("bind configuration is invalid");
+    });
+    vi.resetModules();
+    const { reportRunFailure: freshReportRunFailure } = await import("../run-failure-report.js");
+    const run = buildRun({ status: "failed" });
+
+    await expect(freshReportRunFailure(db, run)).resolves.toBeUndefined();
+
+    expect(mockCaptureRunFailure).not.toHaveBeenCalled();
+  });
+
+  it("calls loadConfig exactly once across two calls to reportRunFailure", async () => {
+    await seedCompanyAndAgent();
+    mockLoadConfig.mockReturnValue({ authPublicBaseUrl: "https://paperclip.example.com" });
+    vi.resetModules();
+    const { reportRunFailure: freshReportRunFailure } = await import("../run-failure-report.js");
+    const firstRun = buildRun({ status: "failed" });
+    const secondRun = buildRun({ status: "failed" });
+
+    await freshReportRunFailure(db, firstRun);
+    await freshReportRunFailure(db, secondRun);
+
+    expect(mockLoadConfig).toHaveBeenCalledTimes(1);
+  });
 });
