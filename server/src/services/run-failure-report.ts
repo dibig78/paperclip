@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { agents, heartbeatRuns, type Db } from "@paperclipai/db";
 import { captureRunFailure, type RunFailureStatus } from "../sentry.js";
 import { redactCurrentUserText } from "../log-redaction.js";
+import { redactSensitiveText } from "../redaction.js";
 import { loadConfig } from "../config.js";
 import { logger } from "../middleware/logger.js";
 
@@ -10,7 +11,21 @@ type HeartbeatRun = typeof heartbeatRuns.$inferSelect;
 
 const UNKNOWN_ADAPTER = "unknown";
 
+/** Sentry rejects an oversized event with HTTP 413. Bound the error message. */
+const MAX_ERROR_MESSAGE_LENGTH = 4096;
+/** The error code is a short label. Bound it well under the message limit. */
+const MAX_ERROR_CODE_LENGTH = 200;
+
 let cachedRunFailureInstance: string | null = null;
+
+/**
+ * Remove a credential and the current user's home path from adapter-supplied
+ * text, then cut the result to `maxLength`. Run the length cut after the
+ * redaction, so a credential cannot survive at a cut boundary.
+ */
+function sanitizeAdapterText(input: string, maxLength: number): string {
+  return redactSensitiveText(redactCurrentUserText(input)).slice(0, maxLength);
+}
 
 /**
  * Resolve the Paperclip instance value a Sentry event carries. Resolve it
@@ -63,8 +78,11 @@ export async function reportRunFailure(db: Db, run: HeartbeatRun): Promise<void>
       instance: resolveRunFailureInstance(),
       taskId,
       runId: run.id,
-      errorMessage: redactCurrentUserText(run.error ?? ""),
-      errorCode: run.errorCode,
+      errorMessage: sanitizeAdapterText(run.error ?? "", MAX_ERROR_MESSAGE_LENGTH),
+      errorCode:
+        run.errorCode === null
+          ? null
+          : sanitizeAdapterText(run.errorCode, MAX_ERROR_CODE_LENGTH),
       agentAdapter: agent?.adapterType ?? UNKNOWN_ADAPTER,
       runStatus: run.status,
     });
