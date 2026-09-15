@@ -1,6 +1,7 @@
 import type { AdapterSessionManagement, ServerAdapterModule } from "@paperclipai/adapter-utils";
 import { ADAPTER_LABEL, ADAPTER_TYPE } from "./shared/constants.js";
 import { execute, getConfigSchema, sessionCodec, testEnvironment } from "./server/index.js";
+import { listHermesSkills as listSkills, syncHermesSkills as syncSkills } from "../server/skills.js";
 
 export const type = ADAPTER_TYPE;
 export const label = ADAPTER_LABEL;
@@ -64,6 +65,8 @@ export function createServerAdapter(): ServerAdapterModule {
     sessionCodec,
     sessionManagement,
     models,
+    listSkills,
+    syncSkills,
     supportsLocalAgentJwt: false,
     supportsInstructionsBundle: false,
     requiresMaterializedRuntimeSkills: false,

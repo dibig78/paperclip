@@ -9,6 +9,8 @@ import { instanceSettingsApi } from "../../api/instanceSettings";
 import { queryKeys } from "../../lib/queryKeys";
 import { resolveSkillSummaryText } from "../../lib/company-skill-summary";
 import { adapterLabels } from "../../components/agent-config-primitives";
+import { useTranslation } from "react-i18next";
+import { skillDescription } from "@/lib/skill-chrome";
 import { cn } from "../../lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,8 +29,6 @@ import { filterAgentSkills } from "./agent-skill-filter";
 import { buildAgentSkillSourceMeta } from "./agent-skill-source";
 import { AgentSkillReleasePicker, releaseShortLabel } from "./AgentSkillReleasePicker";
 
-const MATERIALIZATION_NOTE =
-  "Enabled skills are materialized into the stable Paperclip-managed prompt bundle on the agent's next run.";
 
 /** Company skill key of the Paperclip core skill that carries beta releases. */
 const PAPERCLIP_CORE_SKILL_KEY = "paperclipai/paperclip/paperclip";
@@ -59,6 +59,7 @@ function pinsFromEntries(entries: AgentDesiredSkillEntry[] | undefined): Record<
 }
 
 export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?: string }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [skillDraft, setSkillDraft] = useState<string[]>([]);
   const [lastSavedSkills, setLastSavedSkills] = useState<string[]>([]);
@@ -240,7 +241,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
           iconUrl: skill.iconUrl,
           color: skill.color,
         },
-        summary: resolveSkillSummaryText(skill, { fallbackKey: true }),
+        summary: (() => { const s = resolveSkillSummaryText(skill, { fallbackKey: true }); return s ? skillDescription(s) : s; })(),
         chip: skill.categories[0] ?? null,
         sourceMeta: buildAgentSkillSourceMeta(skill),
         linkTo: `/skills/${skill.id}`,
@@ -294,11 +295,11 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
   const applicationLabel = useMemo(() => {
     switch (skillSnapshot?.mode) {
       case "persistent":
-        return "Kept in workspace";
+        return t("ui.agent_skills_kept_in_workspace");
       case "ephemeral":
-        return "Applied on next run";
+        return t("ui.agent_skills_applied_on_next_run");
       case "unsupported":
-        return "Tracked only";
+        return t("ui.agent_skills_tracked_only");
       default:
         return null;
     }
@@ -311,12 +312,12 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       typeof agent.adapterConfig.agent === "string" &&
       agent.adapterConfig.agent === "custom"
     ) {
-      return "Paperclip cannot manage skills for custom ACP commands yet.";
+      return t("ui.agent_skills_cannot_manage_custom_acp");
     }
     if (agent.adapterType === "openclaw_gateway") {
-      return "Paperclip cannot manage OpenClaw skills here. Visit your OpenClaw instance to manage this agent's skills.";
+      return t("ui.agent_skills_cannot_manage_openclaw");
     }
-    return "Paperclip cannot manage skills for this adapter yet. Manage them in the adapter directly.";
+    return t("ui.agent_skills_cannot_manage_generic");
   }, [agent.adapterConfig.agent, agent.adapterType, unsupported]);
 
   const hasUnsavedChanges = !sameSkillSelection(skillDraft, lastSavedSkills);
@@ -353,7 +354,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       && row.key === PAPERCLIP_CORE_SKILL_KEY;
     const rowDisabled = unsupported || legacyPaperclipBlocked;
     const rowDisabledReason = legacyPaperclipBlocked
-      ? "Paperclip Runner uses native semantic coordination and cannot attach the legacy Paperclip operational skill."
+      ? t("ui.agent_skills_legacy_blocked")
       : unsupportedMessage;
     const showReleasePicker =
       releasePickerActive && variant === "enabled" && row.key === PAPERCLIP_CORE_SKILL_KEY;
@@ -400,7 +401,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-foreground">
-            {enabledRows.length} of {libraryRows.length} enabled
+            {t("ui.agent_skills_enabled_count", { enabled: enabledRows.length, total: libraryRows.length })}
           </span>
           {applicationLabel ? (
             <Tooltip>
@@ -410,7 +411,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-xs">
-                {unsupported ? unsupportedMessage : MATERIALIZATION_NOTE}
+                {unsupported ? unsupportedMessage : t("ui.agent_skills_materialization_note")}
               </TooltipContent>
             </Tooltip>
           ) : null}
@@ -425,15 +426,15 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search skills"
+                placeholder={t("ui.agent_skills_search_placeholder")}
                 className="h-8 w-full pl-8 sm:w-56"
-                aria-label="Search skills"
+                aria-label={t("ui.agent_skills_search_placeholder")}
               />
             </div>
             <Button asChild variant="outline" size="sm" className="shrink-0">
               <Link to="/skills" className="no-underline">
                 <Store className="h-3.5 w-3.5" />
-                Browse skills store
+                {t("ui.agent_skills_browse_store")}
               </Link>
             </Button>
           </div>
@@ -441,7 +442,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
 
         {syncSkills.isError ? (
           <p className="text-xs text-destructive">
-            {syncSkills.error instanceof Error ? syncSkills.error.message : "Failed to update skills"}
+            {syncSkills.error instanceof Error ? syncSkills.error.message : t("ui.agent_skills_failed_update")}
           </p>
         ) : null}
       </div>
@@ -462,16 +463,14 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
               className="flex items-center justify-between gap-3 border-b border-amber-300/40 bg-amber-50/60 px-3 py-2 text-xs text-amber-800 last:border-b-0 dark:border-amber-500/20 dark:bg-amber-950/20 dark:text-amber-200"
             >
               <span className="min-w-0 truncate">
-                <span className="font-medium">{key}</span> is enabled but missing from the organization library.
+                <span className="font-medium">{key}</span> {t("ui.agent_skills_stale_suffix")}
               </span>
               <button
                 type="button"
                 onClick={() => toggleSkill(key, false)}
                 className="inline-flex shrink-0 items-center gap-1 rounded-md border border-amber-400/50 px-2 py-0.5 font-medium transition-colors hover:bg-amber-100/60 dark:hover:bg-amber-900/30"
               >
-                <X className="h-3 w-3" />
-                Remove
-              </button>
+                <X className="h-3 w-3" />{t("ui.agent_skills_remove")}</button>
             </div>
           ))}
         </div>
@@ -483,26 +482,26 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
         <EmptyLibraryCard />
       ) : (
         <div className="space-y-4">
-          <SkillSection title="Enabled on this agent" count={filteredEnabled.length}>
+          <SkillSection title={t("ui.agent_skills_enabled_on_agent")} count={filteredEnabled.length}>
             {filteredEnabled.length > 0 ? (
               filteredEnabled.map((row) => renderRow(row, "enabled"))
             ) : (
               <SectionEmpty>
-                {search ? "No enabled skills match your search." : "No skills enabled on this agent yet."}
+                {search ? t("ui.no_enabled_skills_search") : t("ui.no_enabled_skills_yet")}
               </SectionEmpty>
             )}
           </SkillSection>
 
-          <SkillSection title="Available from the library" count={filteredAvailable.length}>
+          <SkillSection title={t("ui.agent_skills_available_from_library")} count={filteredAvailable.length}>
             {filteredAvailable.length > 0 ? (
               filteredAvailable.map((row) => renderRow(row, "available"))
             ) : (
               <SectionEmpty>
                 {search
-                  ? "No available skills match your search."
+                  ? t("ui.no_available_skills_search")
                   : libraryEmpty
-                    ? "Import skills into the organization library to enable them here."
-                    : "Every library skill is enabled on this agent."}
+                    ? t("ui.import_skills_hint")
+                    : t("ui.all_skills_enabled")}
               </SectionEmpty>
             )}
           </SkillSection>
@@ -518,7 +517,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                     )}
                   />
                   <span className="text-xs font-medium text-muted-foreground">
-                    Automatic and detected skills (read-only)
+                    {t("ui.auto_detected_skills_readonly")}
                   </span>
                   <span className="text-xs text-muted-foreground/70">{filteredDetected.length}</span>
                 </CollapsibleTrigger>
@@ -528,7 +527,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                       <AgentSkillRow key={row.key} variant="readonly" data={row} />
                     ))
                   ) : (
-                    <SectionEmpty>No detected skills match your search.</SectionEmpty>
+                    <SectionEmpty>{t("ui.agent_skills_no_detected_match")}</SectionEmpty>
                   )}
                 </CollapsibleContent>
               </div>
@@ -536,7 +535,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
           ) : null}
 
           <div className="text-xs text-muted-foreground">
-            Adapter: {adapterLabels[agent.adapterType] ?? agent.adapterType}
+            {t("ui.agent_skills_adapter_label")} {adapterLabels[agent.adapterType] ?? agent.adapterType}
           </div>
         </div>
       )}
@@ -553,11 +552,12 @@ function SaveStatusChip({
   unsaved: boolean;
   error: boolean;
 }) {
+  const { t } = useTranslation();
   if (pending) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Saving…
+        {t("ui.agent_skills_saving")}
       </span>
     );
   }
@@ -565,7 +565,7 @@ function SaveStatusChip({
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-destructive">
         <AlertCircle className="h-3.5 w-3.5" />
-        Couldn’t save
+        {t("ui.agent_skills_couldnt_save")}
       </span>
     );
   }
@@ -573,14 +573,14 @@ function SaveStatusChip({
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Saving soon…
+        {t("ui.agent_skills_saving_soon")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-(--status-task-done)">
       <CheckCircle2 className="h-3.5 w-3.5" />
-      Saved
+      {t("ui.agent_skills_saved")}
     </span>
   );
 }
@@ -610,11 +610,12 @@ function SectionEmpty({ children }: { children: React.ReactNode }) {
 }
 
 function EmptyLibraryCard() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border px-6 py-10 text-center">
       <Store className="h-8 w-8 text-muted-foreground/60" />
       <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">No skills in the organization library</p>
+        <p className="text-sm font-medium text-foreground">{t("ui.agent_skills_no_library_title")}</p>
         <p className="text-xs text-muted-foreground">
           Install skills to the organization, then enable them on this agent.
         </p>
@@ -622,7 +623,7 @@ function EmptyLibraryCard() {
       <Button asChild variant="outline" size="sm">
         <Link to="/skills" className="no-underline">
           <Store className="h-3.5 w-3.5" />
-          Browse skills store
+          {t("ui.agent_skills_browse_store")}
         </Link>
       </Button>
     </div>
