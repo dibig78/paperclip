@@ -1042,7 +1042,7 @@ export function Routines() {
                       option ? (
                         currentAssignee ? (
                           <>
-                            <AgentIcon icon={currentAssignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <AgentIcon agentId={currentAssignee.id} agentName={currentAssignee.name} icon={currentAssignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                             <span className="truncate">{option.label}</span>
                           </>
                         ) : (
@@ -1057,7 +1057,7 @@ export function Routines() {
                       const assignee = agentById.get(option.id);
                       return (
                         <>
-                          {assignee ? <AgentIcon icon={assignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                          {assignee ? <AgentIcon agentId={assignee.id} agentName={assignee.name} icon={assignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                           <span className="truncate">{option.label}</span>
                         </>
                       );

@@ -1363,7 +1363,7 @@ function PipelineBoardColumn({
               className="inline-flex max-w-full items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground hover:text-foreground"
               title={`Edit ${stage.name} automation`}
             >
-              <AgentIcon icon={automationAgent.icon} className="h-3.5 w-3.5 shrink-0" />
+              <AgentIcon agentId={automationAgent.id} agentName={automationAgent.name} icon={automationAgent.icon} className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">{automationAgent.name}</span>
             </Link>
           ) : null}

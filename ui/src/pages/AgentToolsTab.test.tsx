@@ -149,6 +149,23 @@ describe("AgentToolsTab", () => {
     await flushReact();
   }
 
+  it("renders Korean tools empty states without changing access or installs", async () => {
+    const { i18n } = await import("../i18n");
+    await i18n.changeLanguage("ko");
+    mockToolsApi.getEffectiveProfilesForAgent.mockResolvedValue({ profiles: [], entries: [], allowedTools: [] });
+    mockToolsApi.listConnections.mockResolvedValue({ connections: [] });
+    mockToolsApi.listPolicies.mockResolvedValue({ policies: [] });
+    await renderTab();
+    expect(container.textContent).toContain("GitHub 계정");
+    expect(container.textContent).toContain("설치된 앱");
+    expect(container.textContent).toContain("허용된 도구");
+    expect(container.textContent).toContain("약 5초");
+    expect(container.textContent).toContain("확장할 수 없습니다");
+    expect(container.querySelector('a[href="/apps/connect?source=github"]')?.textContent).toBe("내 GitHub 연결");
+    expect(mockToolsApi.putConnectionInstalls).not.toHaveBeenCalled();
+    await i18n.changeLanguage("en");
+  });
+
   it("preserves checkbox changes made after the last saved install state", async () => {
     const { mergeInstallDraft } = await import("./AgentToolsTab");
 

@@ -1,3 +1,5 @@
+import { t } from "@/i18n";
+import { AgentPortrait } from "../components/AgentPortrait";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Link, useNavigate, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -51,11 +53,11 @@ export const AGENT_FILTER_TABS = ["all", "active", "paused", "error", "builtin"]
 type FilterTab = (typeof AGENT_FILTER_TABS)[number];
 
 const AGENT_FILTER_TAB_ITEMS: { value: FilterTab; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "paused", label: "Paused" },
-  { value: "error", label: "Error" },
-  { value: "builtin", label: "Built-in" },
+  { value: "all", label: t("ui.all") },
+  { value: "active", label: t("ui.active") },
+  { value: "paused", label: t("ui.paused") },
+  { value: "error", label: t("ui.error") },
+  { value: "builtin", label: t("ui.built_in") },
 ];
 
 function isFilterTab(value: string): value is FilterTab {
@@ -320,7 +322,7 @@ export function Agents({ initialView = "list" }: { initialView?: AgentsView } = 
   }, [agents, environmentsById, environmentCapabilities, instanceSettings?.defaultEnvironmentId]);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Agents" }]);
+    setBreadcrumbs([{ label: t("ui.agents") }]);
   }, [setBreadcrumbs]);
 
   useEffect(() => {
@@ -395,11 +397,11 @@ export function Agents({ initialView = "list" }: { initialView?: AgentsView } = 
           agent.pausedAt && tab !== "paused" ? "opacity-50" : "",
           resourceMembershipState(membershipsQuery.data, "agent", agent.id) === "left" ? "sm:text-foreground/55" : "",
         )}
-        leading={hasInvalidOrgChain ? (
+        leading={<><AgentPortrait agent={agent} />{hasInvalidOrgChain ? (
           <AlertTriangle className="h-3.5 w-3.5 text-amber-500" aria-label="Invalid reporting chain" />
         ) : (
           <AgentStatusCapsule status={agent.status} />
-        )}
+        )}</>}
         secondaryRow={builtInCluster && (
           <div className="@5xl:hidden flex flex-wrap items-center gap-1.5">
             {builtInCluster}

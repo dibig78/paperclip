@@ -1415,6 +1415,23 @@ describe("TaskChatComposer", () => {
     expect(trigger?.textContent).toContain("Sam");
   });
 
+  it("shows stable agent portraits in the assignee chip and all nine dropdown entries", async () => {
+    const { default: portraits } = await import("../../../public/agent-portraits/dib39/manifest.json");
+    render(<TaskChatComposer onAdd={vi.fn()} workMode="standard" enableReassign
+      reassignOptions={portraits.map(p => ({ id: `agent:${p.agentId}`, label: p.name }))}
+      agentMap={new Map(portraits.map(p => [p.agentId, { icon: "bot" }]))}
+      currentAssigneeValue={`agent:${portraits[0]!.agentId}`} />);
+    const trigger = container.querySelector<HTMLButtonElement>('[data-testid="task-chat-composer-assignee"]')!;
+    expect(trigger.querySelector("img")?.getAttribute("src")).toContain(portraits[0]!.path);
+    flushSync(() => trigger.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    await flushAsync();
+    for (const portrait of portraits) {
+      const image = document.querySelector(`[data-assignee-option-icon="agent:${portrait.agentId}"] img`);
+      expect(image?.getAttribute("src")).toContain(portrait.path);
+      expect(image?.getAttribute("data-agent-id")).toBe(portrait.agentId);
+    }
+  });
+
   it("shows configured agent icons in the assignee trigger and dropdown options", async () => {
     render(
       <TaskChatComposer

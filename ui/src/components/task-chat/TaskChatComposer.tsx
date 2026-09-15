@@ -263,7 +263,7 @@ function AssigneeIdentityAvatar({
         }
       >
         <AvatarFallback>
-          <AgentIcon icon={icon} className="h-3 w-3" />
+          <AgentIcon agentId={agentId} agentName={label} icon={icon} className="h-5 w-5" />
         </AvatarFallback>
       </Avatar>
     );

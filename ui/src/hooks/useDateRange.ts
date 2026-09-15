@@ -118,3 +118,18 @@ export function useDateRange(): UseDateRangeResult {
     customReady,
   };
 }
+
+
+export function getPresetLabel(preset: DatePreset, t?: (key: string) => string): string {
+  if (t) {
+    switch (preset) {
+      case "mtd": return t("ui.preset_mtd");
+      case "7d": return t("ui.preset_7d");
+      case "30d": return t("ui.preset_30d");
+      case "ytd": return t("ui.preset_ytd");
+      case "all": return t("ui.preset_all");
+      case "custom": return t("ui.preset_custom");
+    }
+  }
+  return PRESET_LABELS[preset];
+}

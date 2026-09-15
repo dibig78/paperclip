@@ -189,7 +189,7 @@ export function ExecutionParticipantPicker({
                   )}
                   onClick={() => toggle(encoded)}
                 >
-                  <AgentIcon icon={agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
+                  <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
                   {agent.name}
                 </button>
               );

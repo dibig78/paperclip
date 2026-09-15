@@ -1,6 +1,7 @@
 import { Link } from "@/lib/router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { deriveInitials } from "./Identity";
+import { AgentPortrait } from "./AgentPortrait";
 import { IssueReferenceActivitySummary } from "./IssueReferenceActivitySummary";
 import { timeAgo } from "../lib/timeAgo";
 import { cn } from "../lib/utils";
@@ -54,10 +55,18 @@ export function ActivityRow({ event, agentMap, userProfileMap, entityNameMap, en
   const inner = (
     <div className="space-y-2">
       <div className="flex items-start gap-2 @xl:grid @xl:grid-cols-(--dashboard-activity-list-columns) @xl:items-baseline">
-        <Avatar size="sm" aria-hidden="true" className="@xl:self-center">
-          {actorAvatarUrl && <AvatarImage src={actorAvatarUrl} alt="" />}
-          <AvatarFallback>{deriveInitials(actorName)}</AvatarFallback>
-        </Avatar>
+        {actor ? (
+          <AgentPortrait agent={actor} className="size-6 @xl:self-center" fallback={
+            <Avatar size="sm" aria-hidden="true" className="@xl:self-center">
+              <AvatarFallback>{deriveInitials(actorName)}</AvatarFallback>
+            </Avatar>
+          } />
+        ) : (
+          <Avatar size="sm" aria-hidden="true" className="@xl:self-center">
+            {actorAvatarUrl && <AvatarImage src={actorAvatarUrl} alt="" />}
+            <AvatarFallback>{deriveInitials(actorName)}</AvatarFallback>
+          </Avatar>
+        )}
         <div className="flex min-w-0 flex-1 flex-col gap-1 @xl:contents">
           <div className="flex min-w-0 items-baseline gap-2 @xl:contents">
             <p className="flex h-6 min-w-0 flex-1 items-center gap-1.5">

@@ -1,3 +1,4 @@
+import { t } from "@/i18n";
 import { normalizeLegacyRunnerProvider } from "@paperclipai/adapter-utils";
 import { memo, useState, useEffect, useRef, useCallback, useMemo, type ChangeEvent, type CSSProperties, type DragEvent, type RefObject } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -1478,7 +1479,7 @@ export function NewIssueDialog() {
                 value={assigneeValue}
                 options={assigneeOptions}
                 recentOptionIds={recentAssigneeOptionIds}
-                placeholder="Assignee"
+                placeholder={t("ui.assignee")}
                 className="h-8 px-2.5 py-0 sm:h-auto sm:px-2 sm:py-1"
                 triggerDataSlot="new-issue-compact-control"
                 disablePortal
@@ -1507,14 +1508,14 @@ export function NewIssueDialog() {
                   option ? (
                     currentAssignee ? (
                       <>
-                        <AgentIcon icon={currentAssignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <AgentIcon agentId={currentAssignee.id} agentName={currentAssignee.name} icon={currentAssignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         <span className="truncate">{option.label}</span>
                       </>
                     ) : (
                       <span className="truncate">{option.label}</span>
                     )
                   ) : (
-                    <span className="text-muted-foreground">Assignee</span>
+                    <span className="text-muted-foreground">{t("ui.assignee")}</span>
                   )
                 }
                 renderOption={(option) => {
@@ -1524,7 +1525,7 @@ export function NewIssueDialog() {
                     : null;
                   return (
                     <>
-                      {assignee ? <AgentIcon icon={assignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                      {assignee ? <AgentIcon agentId={assignee.id} agentName={assignee.name} icon={assignee.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                       <span className="truncate">{option.label}</span>
                       {assignee && getTrustPreset(assignee.permissions) === "low_trust_review" ? (
                         <ShieldAlert className="ml-auto h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-300" aria-label="Low-trust review agent" />
@@ -1539,7 +1540,7 @@ export function NewIssueDialog() {
                 value={projectId}
                 options={projectOptions}
                 recentOptionIds={recentProjectIds}
-                placeholder="Project"
+                placeholder={t("ui.project")}
                 className="h-8 px-2.5 py-0 sm:h-auto sm:px-2 sm:py-1"
                 triggerDataSlot="new-issue-compact-control"
                 disablePortal
@@ -1560,7 +1561,7 @@ export function NewIssueDialog() {
                       <span className="truncate">{option.label}</span>
                     </>
                   ) : (
-                    <span className="text-muted-foreground">Project</span>
+                    <span className="text-muted-foreground">{t("ui.project")}</span>
                   )
                 }
                 renderOption={(option) => {
@@ -1665,7 +1666,7 @@ export function NewIssueDialog() {
                         const reviewer = parseAssigneeValue(option.id).assigneeAgentId
                           ? (agents ?? []).find((a) => a.id === parseAssigneeValue(option.id).assigneeAgentId)
                           : null;
-                        return reviewer ? <AgentIcon icon={reviewer.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
+                        return reviewer ? <AgentIcon agentId={reviewer.id} agentName={reviewer.name} icon={reviewer.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
                       })()}
                       <span className="truncate">{option.label}</span>
                     </>
@@ -1680,7 +1681,7 @@ export function NewIssueDialog() {
                     : null;
                   return (
                     <>
-                      {reviewer ? <AgentIcon icon={reviewer.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                      {reviewer ? <AgentIcon agentId={reviewer.id} agentName={reviewer.name} icon={reviewer.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                       <span className="truncate">{option.label}</span>
                     </>
                   );
@@ -1710,7 +1711,7 @@ export function NewIssueDialog() {
                         const approver = parseAssigneeValue(option.id).assigneeAgentId
                           ? (agents ?? []).find((a) => a.id === parseAssigneeValue(option.id).assigneeAgentId)
                           : null;
-                        return approver ? <AgentIcon icon={approver.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
+                        return approver ? <AgentIcon agentId={approver.id} agentName={approver.name} icon={approver.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
                       })()}
                       <span className="truncate">{option.label}</span>
                     </>
@@ -1725,7 +1726,7 @@ export function NewIssueDialog() {
                     : null;
                   return (
                     <>
-                      {approver ? <AgentIcon icon={approver.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                      {approver ? <AgentIcon agentId={approver.id} agentName={approver.name} icon={approver.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                       <span className="truncate">{option.label}</span>
                     </>
                   );
@@ -1747,7 +1748,7 @@ export function NewIssueDialog() {
                     >
                       {selectedWatchdogAgent ? (
                         <>
-                          <AgentIcon icon={selectedWatchdogAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          <AgentIcon agentId={selectedWatchdogAgent.id} agentName={selectedWatchdogAgent.name} icon={selectedWatchdogAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                           <span className="truncate text-foreground">{selectedWatchdogAgent.name}</span>
                           {watchdogInstructions.trim() ? (
                             <span className="truncate text-muted-foreground">· {watchdogInstructions.trim()}</span>
@@ -1773,7 +1774,7 @@ export function NewIssueDialog() {
                           option ? (
                             <>
                               {selectedWatchdogAgent ? (
-                                <AgentIcon icon={selectedWatchdogAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                <AgentIcon agentId={selectedWatchdogAgent.id} agentName={selectedWatchdogAgent.name} icon={selectedWatchdogAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                               ) : null}
                               <span className="truncate">{option.label}</span>
                             </>
@@ -1785,7 +1786,7 @@ export function NewIssueDialog() {
                           const agent = (agents ?? []).find((a) => a.id === option.id);
                           return (
                             <>
-                              {agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                              {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                               <span className="truncate">{option.label}</span>
                             </>
                           );

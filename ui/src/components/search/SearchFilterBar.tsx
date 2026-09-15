@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { User, UserX } from "lucide-react";
+import { AgentIcon } from "@/components/AgentIconPicker";
+import { useCompany } from "@/context/CompanyContext";
 import {
   COMPANY_SEARCH_UPDATED_WITHIN_OPTIONS,
   ISSUE_PRIORITIES,
@@ -106,6 +108,7 @@ export function buildSearchFilterOptions({
     assignee.push({
       value: `agent:${agent.id}`,
       label: agent.name,
+      icon: <AgentIcon agentId={agent.id} agentName={agent.name} icon={null} className="h-3.5 w-3.5 shrink-0 rounded-full object-cover" />,
       count: count(counts?.assigneeAgentId, agent.id),
       searchText: agent.name,
     });

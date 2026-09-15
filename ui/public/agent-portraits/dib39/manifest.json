@@ -1,0 +1,119 @@
+[
+  {
+    "name": "luke",
+    "agentId": "cc1d27b9-dc40-4bba-9d7c-38423ad8f70a",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/luke.png",
+    "path": "/agent-portraits/dib39/luke.png",
+    "sha256": "3defe1e38d68f94e80cc9fa315d688071856e7b7b9fb2d36c3c49457f8c9ba78",
+    "bytes": 1215265,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "leo",
+    "agentId": "65dfd2ae-cc73-43e1-a6e5-b72aea7c6dcd",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/leo.png",
+    "path": "/agent-portraits/dib39/leo.png",
+    "sha256": "4725a8dcfd8cfea133e551956f1d323176e586ed230d3f80211d454a23fcc049",
+    "bytes": 1272048,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "rian",
+    "agentId": "05d1c14f-aa24-45d2-b172-36ee2652517a",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/rian.png",
+    "path": "/agent-portraits/dib39/rian.png",
+    "sha256": "ba4989ebfd07adf90699fdc68e9ad9284297a3bd87575bcdf8bcab2a25d2bd4f",
+    "bytes": 1167324,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "yuna",
+    "agentId": "2e6753fd-0f28-4f68-8a2f-41d594506651",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/yuna.png",
+    "path": "/agent-portraits/dib39/yuna.png",
+    "sha256": "fcc8d55951323067f7fab15a80e1a744a1313c33d34cf1e02f1140615752b921",
+    "bytes": 1350995,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "shadow",
+    "agentId": "e08957bc-8377-4380-893c-6e3691b59196",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/shadow.png",
+    "path": "/agent-portraits/dib39/shadow.png",
+    "sha256": "45928e194369f5b5a35549cf1e0e018ac66330b8f4cd58640ec17b241db287df",
+    "bytes": 1413981,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "noah",
+    "agentId": "7d530869-8327-4117-a6d4-89ebdd96d126",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/noah.png",
+    "path": "/agent-portraits/dib39/noah.png",
+    "sha256": "8c13c16e6e7a2136a13f3688f57d90529e420af2e930562c8c5b896cf2d08e48",
+    "bytes": 1169780,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "teo",
+    "agentId": "62079aa1-a706-4f4b-b9b3-c8e35d9ea055",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/teo.png",
+    "path": "/agent-portraits/dib39/teo.png",
+    "sha256": "ef9fea9ed9117b0f4e0438f5b4e70a958a46d9a5e63ccd818d3de00353ad65fb",
+    "bytes": 1059052,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "kai",
+    "agentId": "8476ba52-c271-456c-a5fb-a9fa229462b1",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/kai.png",
+    "path": "/agent-portraits/dib39/kai.png",
+    "sha256": "323361c3e548440670a8c6db0c5f4cead61f73e3b272824ac2191362c77946dc",
+    "bytes": 1163350,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  },
+  {
+    "name": "elina",
+    "agentId": "c4115a2c-a0e7-4fd7-acb2-9161979bc554",
+    "companyId": "7918aebd-d2b9-4f6e-8fd7-09f19b5bd8e2",
+    "source": "https://dibig78.myasustor.com/vacation/agent-roles/assets/elina.png",
+    "path": "/agent-portraits/dib39/elina.png",
+    "sha256": "a5f054e2b2754a944278b6eeaa78f64665f06303afa128b842805cae0ddc5f6d",
+    "bytes": 1205103,
+    "dimensions": [
+      1024,
+      1024
+    ]
+  }
+]

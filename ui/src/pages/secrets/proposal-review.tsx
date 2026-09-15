@@ -126,7 +126,7 @@ export function AgentRefChip({
 }) {
   return (
     <span className={cn("inline-flex min-w-0 items-center gap-1", className)}>
-      <AgentIcon icon={agent.icon ?? null} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon ?? null} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className="min-w-0 truncate">{agent.name}</span>
     </span>
   );

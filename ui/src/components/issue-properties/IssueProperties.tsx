@@ -1141,7 +1141,7 @@ export function IssueProperties({
     <span className="inline-flex min-w-0 max-w-full items-center gap-1.5 text-sm" title={issue.watchdog.instructions?.trim() || undefined}>
       {(() => {
         const agent = (agents ?? []).find((candidate) => candidate.id === issue.watchdog?.watchdogAgentId);
-        return agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
+        return agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null;
       })()}
       <span className="shrink-0 max-w-40 truncate">{agentName(issue.watchdog.watchdogAgentId)}</span>
       {issue.watchdog.instructions?.trim() ? (
@@ -1185,7 +1185,7 @@ export function IssueProperties({
             const agent = (agents ?? []).find((candidate) => candidate.id === option.id);
             return (
               <>
-                {agent ? <AgentIcon icon={agent.icon} className="h-3 w-3 shrink-0 text-muted-foreground" /> : null}
+                {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3 w-3 shrink-0 text-muted-foreground" /> : null}
                 <span className="truncate">{option.label}</span>
               </>
             );
@@ -1194,7 +1194,7 @@ export function IssueProperties({
             const agent = (agents ?? []).find((candidate) => candidate.id === option.id);
             return (
               <>
-                {agent ? <AgentIcon icon={agent.icon} className="h-3 w-3 shrink-0 text-muted-foreground" /> : null}
+                {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3 w-3 shrink-0 text-muted-foreground" /> : null}
                 <span className="truncate">{option.label}</span>
               </>
             );
@@ -1691,7 +1691,10 @@ export function IssueProperties({
   );
 
   const assigneeTrigger = assignee ? (
-    <Identity name={assignee.name} size="sm" shape="square" />
+    <span className="inline-flex min-w-0 items-center gap-1.5">
+      <AgentIcon agentId={assignee.id} agentName={assignee.name} icon={assignee.icon} companyId={assignee.companyId ?? companyId ?? undefined} className="size-5 shrink-0 rounded-full object-cover" />
+      <span className="min-w-0 truncate text-sm" title={assignee.name}>{assignee.name}</span>
+    </span>
   ) : assigneeUserLabel ? (
     <>
       <User className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
@@ -1771,7 +1774,7 @@ export function IssueProperties({
       }}
     >
       {option.kind === "agent" ? (
-        <AgentIcon icon={option.agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
+        <AgentIcon agentId={option.agent.id} agentName={option.agent.name} icon={option.agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
       ) : option.kind === "user" ? (
         <User className="h-3 w-3 shrink-0 text-muted-foreground" />
       ) : null}
@@ -1930,7 +1933,7 @@ export function IssueProperties({
                 )}
                 onClick={() => toggleExecutionParticipant(stageType, encoded)}
               >
-                <AgentIcon icon={agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
+                <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
                 {agent.name}
               </button>
             );
@@ -2941,7 +2944,7 @@ export function IssueProperties({
                     title={`Archived by ${archivedByName} · ${formatDateTime(issue.archivedAt)}`}
                   >
                     {archivedByAgent
-                      ? <AgentIcon icon={archivedByAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      ? <AgentIcon agentId={archivedByAgent.id} agentName={archivedByAgent.name} icon={archivedByAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                       : null}
                     <span className="min-w-0 truncate">
                       {archivedByName}

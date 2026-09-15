@@ -11,16 +11,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { AGENT_ICONS, getAgentIcon } from "../lib/agent-icons";
+import { AgentPortrait } from "./AgentPortrait";
+import portraits from "../../public/agent-portraits/dib39/manifest.json";
 
 const DEFAULT_ICON: AgentIconName = "bot";
 
 interface AgentIconProps {
   icon: string | null | undefined;
+  agentId?: string | null;
+  agentName?: string | null;
+  companyId?: string | null;
   className?: string;
 }
 
-export function AgentIcon({ icon, className }: AgentIconProps) {
+export function AgentIcon({ icon, agentId, agentName, companyId, className }: AgentIconProps) {
   const Icon = getAgentIcon(icon);
+  const targetId = agentId; // Icon names are presentation, never identity.
+  
+  if (targetId) {
+    const portrait = portraits.find(p => p.agentId === targetId && (!companyId || p.companyId === companyId));
+    if (portrait) {
+      return (
+        <AgentPortrait
+          agent={{ id: portrait.agentId, companyId: portrait.companyId, name: agentName || portrait.name }}
+          fallback={<Icon className={className} />}
+          className={className}
+        />
+      );
+    }
+  }
+
   return <Icon className={className} />;
 }
 

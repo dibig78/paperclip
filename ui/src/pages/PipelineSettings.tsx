@@ -2825,7 +2825,7 @@ export function PipelineSettings() {
                                 const agent = option.id.startsWith("agent:") ? agentById.get(option.id.slice("agent:".length)) : null;
                                 return (
                                   <>
-                                    {agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                                    {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                                     <span className="truncate">{option.label}</span>
                                   </>
                                 );
@@ -2835,7 +2835,7 @@ export function PipelineSettings() {
                                 const agent = option.id.startsWith("agent:") ? agentById.get(option.id.slice("agent:".length)) : null;
                                 return (
                                   <>
-                                    {agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                                    {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                                     <span className="truncate">{option.label}</span>
                                   </>
                                 );
@@ -2916,7 +2916,7 @@ export function PipelineSettings() {
                                 : null;
                               return (
                                 <>
-                                  {agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                                  {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                                   <span className="truncate">{option.label}</span>
                                 </>
                               );
@@ -2927,7 +2927,7 @@ export function PipelineSettings() {
                               const agent = agentId ? agentById.get(agentId) : null;
                               return (
                                 <>
-                                  {agent ? <AgentIcon icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
+                                  {agent ? <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> : null}
                                   <span className="truncate">{option.label}</span>
                                 </>
                               );
@@ -3056,7 +3056,7 @@ export function PipelineSettings() {
                             ) : null}
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <AgentIcon icon={selectedAutomationAgent.icon} className="h-4 w-4 shrink-0" />
+                            <AgentIcon agentId={selectedAutomationAgent.id} agentName={selectedAutomationAgent.name} icon={selectedAutomationAgent.icon} className="h-4 w-4 shrink-0" />
                             <span>{selectedAutomationAgent.name} runs this step automatically.</span>
                           </div>
                           <FieldRow label="Issue title">

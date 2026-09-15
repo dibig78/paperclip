@@ -1,3 +1,5 @@
+import { t } from "@/i18n";
+import portraits from "../../public/agent-portraits/dib39/manifest.json";
 import { ExecutionBlockerNotice } from "../components/ExecutionBlockerNotice";
 import type { TaskComposerPause } from "../components/task-chat/TaskChatPausedTakeover";
 import { TaskDetailTasksPanel } from "@/components/task-detail/TaskDetailTasksPanel";
@@ -691,7 +693,7 @@ function AttributionAvatar({
   actor,
   via,
 }: {
-  label: "Assignee" | "Originating";
+  label: string;
   actor: AttributionActor;
   via?: string | null;
 }) {
@@ -699,6 +701,10 @@ function AttributionAvatar({
     ? `${label}: ${actor.name} · via ${via}`
     : `${label}: ${actor.name}`;
   const testIdLabel = label.toLowerCase();
+  const portrait = actor.kind === "agent"
+    ? portraits.find((p) => p.agentId === actor.id)
+    : null;
+  const avatarUrl = actor.avatarUrl ?? (portrait ? `${portrait.path}?v=${portrait.sha256.slice(0, 12)}` : null);
 
   return (
     <Tooltip>
@@ -710,8 +716,8 @@ function AttributionAvatar({
           data-testid={`issue-${testIdLabel}-avatar`}
           className="ring-2 ring-background"
         >
-          {actor.avatarUrl ? (
-            <AvatarImage src={actor.avatarUrl} alt="" />
+          {avatarUrl ? (
+            <AvatarImage src={avatarUrl} alt="" />
           ) : null}
           <AvatarFallback>{attributionInitials(actor.name)}</AvatarFallback>
         </Avatar>
@@ -726,8 +732,8 @@ function AttributionAvatar({
             shape={actor.kind === "agent" ? "square" : "circle"}
             className="ring-1 ring-background/30"
           >
-            {actor.avatarUrl ? (
-              <AvatarImage src={actor.avatarUrl} alt="" />
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt="" />
             ) : null}
             <AvatarFallback className="bg-background/20 text-background">
               {attributionInitials(actor.name)}
@@ -820,7 +826,7 @@ function IssueAttributionByline({
         data-testid="issue-attribution-avatar-stack"
       >
         {assignee ? (
-          <AttributionAvatar label="Assignee" actor={assignee} />
+          <AttributionAvatar label={t("ui.assignee")} actor={assignee} />
         ) : null}
         {originator ? (
           <AttributionAvatar
@@ -3174,7 +3180,7 @@ export function IssueDetail({ tasksTab }: { tasksTab?: TaskSidePanelProps["tasks
   const sourceBreadcrumb = useMemo(
     () =>
       readIssueDetailBreadcrumb(issueId, location.state, location.search) ?? {
-        label: "Tasks",
+        label: t("ui.tasks"),
         href: "/issues",
       },
     [issueId, location.state, location.search],

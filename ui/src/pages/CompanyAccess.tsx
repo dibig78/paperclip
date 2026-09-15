@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -36,6 +37,7 @@ const reassignmentIssueStatuses = "backlog,todo,in_progress,in_review,blocked,fa
 type EditableMemberStatus = "pending" | "active" | "suspended";
 
 export function CompanyAccess() {
+  const { t } = useTranslation();
   const { selectedCompany, selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
   const { pushToast } = useToast();
@@ -264,15 +266,15 @@ export function CompanyAccess() {
     <div className="max-w-6xl space-y-8">
       <div className="flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-lg font-semibold">Organization Members</h1>
+        <h1 className="text-lg font-semibold">{t("ui.organization_members")}</h1>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col gap-4">
         {!hideInvitesTab && (
           <PageTabBar
             items={[
-              { value: "members", label: "Members" },
-              { value: "invites", label: "Invites" },
+              { value: "members", label: t("ui.members") },
+              { value: "invites", label: t("ui.invites") },
             ]}
             align="start"
             value={activeTab}
@@ -292,7 +294,7 @@ export function CompanyAccess() {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h3 className="text-sm font-semibold">Pending human joins</h3>
+                <h3 className="text-sm font-semibold">{t("ui.pending_human_joins")}</h3>
                 <p className="text-sm text-muted-foreground">
                   Review pending join requests before they become active organization members.
                 </p>

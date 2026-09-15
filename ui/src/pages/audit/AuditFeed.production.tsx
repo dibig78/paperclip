@@ -112,7 +112,7 @@ function AuditActor({
     return (
       <span className="inline-flex min-w-0 items-center gap-1.5" title={agent.name}>
         <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <AgentIcon icon={agent.icon} className="h-3 w-3" />
+          <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon} className="h-3 w-3" />
         </span>
         <span className="truncate font-medium text-foreground">{agent.name}</span>
       </span>

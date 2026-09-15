@@ -96,7 +96,9 @@ describe("AgentActionButtons", () => {
   let queryClient: QueryClient;
   let invalidateQueries: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const { i18n } = await import("../i18n");
+    await i18n.changeLanguage("en");
     container = document.createElement("div");
     document.body.appendChild(container);
     root = null;
@@ -133,6 +135,24 @@ describe("AgentActionButtons", () => {
       </QueryClientProvider>,
     );
   }
+
+  it.each(["Rian", "Alpha Agent", "Coder"])("renders shared Korean action labels for %s without invoking actions", async (name) => {
+    const { i18n } = await import("../i18n");
+    await i18n.changeLanguage("ko");
+    render(makeAgent({ id: `agent-${name}`, name }), {
+      runLabel: undefined,
+      canRunWithProviderTrace: true,
+    });
+    await flushReact();
+
+    expect(container.textContent).toContain("업무 배정");
+    expect(container.textContent).toContain("지금 실행");
+    expect(container.textContent).toContain("공급자 추적과 함께 실행");
+    expect(container.querySelector(`[aria-label="${name} 작업 메뉴 열기"]`)).toBeTruthy();
+    expect(mockAgentsApi.invoke).not.toHaveBeenCalled();
+    expect(mockOpenNewIssue).not.toHaveBeenCalled();
+    await i18n.changeLanguage("en");
+  });
 
   it("replaces the pause slot with Clear error for error agents", async () => {
     render(makeAgent({ status: "error" }));

@@ -1,3 +1,5 @@
+import { t } from "@/i18n";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   Inbox,
   ListChecks,
@@ -145,13 +147,13 @@ export function Sidebar() {
                 )}
               >
                 <SquarePen className="h-4 w-4 shrink-0" />
-                <span className={rail ? SIDEBAR_RAIL_HIDDEN_LABEL : "truncate"}>New Task</span>
+                <span className={rail ? SIDEBAR_RAIL_HIDDEN_LABEL : "truncate"}>{t("ui.new_task")}</span>
               </button>
             );
             return rail ? (
               <Tooltip>
                 <TooltipTrigger asChild>{newTaskButton}</TooltipTrigger>
-                <TooltipContent side="right">New Task</TooltipContent>
+                <TooltipContent side="right">{t("ui.new_task")}</TooltipContent>
               </Tooltip>
             ) : (
               newTaskButton
@@ -161,11 +163,11 @@ export function Sidebar() {
               width; a nav row also keeps search reachable from the
               collapsed rail, where the old header icon was dropped entirely.
               Cmd/Ctrl+K remains the keyboard path (command palette). */}
-          <SidebarNavItem to="/search" label="Search" icon={Search} />
-          <SidebarNavItem to="/dashboard" label="Dashboard" icon={LayoutDashboard} liveCount={liveRunCount} />
+          <SidebarNavItem to="/search" label={t("ui.search")} icon={Search} />
+          <SidebarNavItem to="/dashboard" label={t("ui.dashboard")} icon={LayoutDashboard} liveCount={liveRunCount} />
           <SidebarNavItem
             to="/inbox"
-            label="Inbox"
+            label={t("ui.inbox")}
             icon={Inbox}
             badge={inboxBadge.inbox}
             badgeLabel="unread"
@@ -175,38 +177,38 @@ export function Sidebar() {
           {showDecisions ? (
             <SidebarNavItem
               to="/decisions"
-              label="Decisions"
+              label={t("ui.decisions")}
               icon={ListChecks}
               badge={attentionCount}
               badgeLabel="decisions"
             />
           ) : null}
           {showStatusCards ? (
-            <SidebarNavItem to="/status" label="Status" icon={LayoutGrid} textBadge="beta" />
+            <SidebarNavItem to="/status" label={t("ui.status")} icon={LayoutGrid} textBadge="beta" />
           ) : null}
           {conferenceRoomChatEnabled ? (
-            <SidebarNavItem to="/board-chat" label="Conference Room" icon={MessagesSquare} />
+            <SidebarNavItem to="/board-chat" label={t("ui.conference_room")} icon={MessagesSquare} />
           ) : null}
         </div>
 
-        <SidebarSection label="Work" collapsible={{ open: workOpen, onOpenChange: setWorkOpen }}>
-          <SidebarNavItem to="/issues" label="Tasks" icon={CircleCheck} />
+        <SidebarSection label={t("ui.work")} collapsible={{ open: workOpen, onOpenChange: setWorkOpen }}>
+          <SidebarNavItem to="/issues" label={t("ui.tasks")} icon={CircleCheck} />
           {streamlinedUiEnabled ? (
             <>
-              <SidebarNavItem to="/projects" label="Projects" icon={FolderOpen} />
+              <SidebarNavItem to="/projects" label={t("ui.projects")} icon={FolderOpen} />
               <SidebarStarredProjects />
             </>
           ) : null}
-          <SidebarNavItem to="/routines" label="Routines" icon={Repeat} />
-          <SidebarNavItem to="/artifacts" label="Artifacts" icon={Package} />
+          <SidebarNavItem to="/routines" label={t("ui.routines")} icon={Repeat} />
+          <SidebarNavItem to="/artifacts" label={t("ui.artifacts")} icon={Package} />
           {showCases ? (
-            <SidebarNavItem to="/cases" label="Cases" icon={Layers} textBadge="beta" />
+            <SidebarNavItem to="/cases" label={t("ui.cases")} icon={Layers} textBadge="beta" />
           ) : null}
           {showPipelines ? (
-            <SidebarNavItem to="/pipelines" label="Pipelines" icon={GitBranch} />
+            <SidebarNavItem to="/pipelines" label={t("ui.pipelines")} icon={GitBranch} />
           ) : null}
           {showGoalsLink ? (
-            <SidebarNavItem to="/goals" label="Goals" icon={Target} />
+            <SidebarNavItem to="/goals" label={t("ui.goals")} icon={Target} />
           ) : goalsLinkPending ? (
             <div
               data-testid="sidebar-goals-placeholder"
@@ -215,7 +217,7 @@ export function Sidebar() {
             />
           ) : null}
           {showWorkspacesLink ? (
-            <SidebarNavItem to="/workspaces" label="Workspaces" icon={GitBranch} />
+            <SidebarNavItem to="/workspaces" label={t("ui.workspaces")} icon={GitBranch} />
           ) : null}
           <PluginSlotOutlet
             slotTypes={["sidebar"]}
@@ -234,13 +236,13 @@ export function Sidebar() {
 
         {streamlinedUiEnabled ? (
           <SidebarSection
-            label="Org"
+            label={t("ui.org")}
             collapsible={{ open: organizationOpen, onOpenChange: setOrganizationOpen }}
           >
-            <SidebarNavItem to="/agents" label="Agents" icon={Users} />
-            <SidebarNavItem to="/skills" label="Skills" icon={Boxes} />
-            <SidebarNavItem to="/apps" label="Connectors" icon={Unplug} />
-            <SidebarNavItem to="/activity" label="Audit" icon={History} />
+            <SidebarNavItem to="/agents" label={t("ui.agents")} icon={Users} />
+            <SidebarNavItem to="/skills" label={t("ui.skills")} icon={Boxes} />
+            <SidebarNavItem to="/apps" label={t("ui.connectors")} icon={Unplug} />
+            <SidebarNavItem to="/activity" label={t("ui.audit")} icon={History} />
           </SidebarSection>
         ) : null}
 
@@ -251,15 +253,15 @@ export function Sidebar() {
             <SidebarProjects />
             <SidebarAgents />
             <SidebarSection
-              label="Organization"
+              label={t("ui.organization")}
               collapsible={{ open: organizationOpen, onOpenChange: setOrganizationOpen }}
             >
-              <SidebarNavItem to="/org" label="Org" icon={Network} />
-              <SidebarNavItem to="/apps" label="Connectors" icon={Unplug} />
-              <SidebarNavItem to="/timeline" label="Timeline" icon={GanttChartSquare} />
-              <SidebarNavItem to="/costs" label="Costs" icon={DollarSign} />
-              <SidebarNavItem to="/activity" label="Activity" icon={History} />
-              <SidebarNavItem to="/company/settings" label="Settings" icon={Settings} />
+              <SidebarNavItem to="/org" label={t("ui.org")} icon={Network} />
+              <SidebarNavItem to="/apps" label={t("ui.connectors")} icon={Unplug} />
+              <SidebarNavItem to="/timeline" label={t("ui.timeline")} icon={GanttChartSquare} />
+              <SidebarNavItem to="/costs" label={t("ui.costs")} icon={DollarSign} />
+              <SidebarNavItem to="/activity" label={t("ui.activity")} icon={History} />
+              <SidebarNavItem to="/company/settings" label={t("ui.settings")} icon={Settings} />
             </SidebarSection>
           </>
         )}
@@ -272,6 +274,7 @@ export function Sidebar() {
           missingBehavior="placeholder"
         />
       </nav>
+      {!rail && <LanguageSelector />}
     </aside>
   );
 }

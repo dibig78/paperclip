@@ -180,7 +180,7 @@ function AgentAccessSection({
         <div className="space-y-0.5">
           {selectedAgents.map((agent) => (
             <div key={agent.id} className="flex items-center gap-2 px-1.5 py-1 text-sm">
-              <AgentIcon icon={agent.icon ?? null} className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <AgentIcon agentId={agent.id} agentName={agent.name} icon={agent.icon ?? null} className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="min-w-0 flex-1 truncate text-foreground">{agent.name}</span>
             </div>
           ))}

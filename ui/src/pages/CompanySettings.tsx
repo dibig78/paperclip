@@ -1,3 +1,4 @@
+import { t } from "@/i18n";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -157,7 +158,7 @@ export function CompanySettings() {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Company", href: "/dashboard" },
-      { label: "Settings" }
+      { label: t("ui.settings") }
     ]);
   }, [setBreadcrumbs, selectedCompany?.name]);
 
@@ -180,7 +181,7 @@ export function CompanySettings() {
     <div className="max-w-6xl space-y-8">
       <div className="flex items-center gap-2">
         <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-lg font-semibold">General</h1>
+        <h1 className="text-lg font-semibold">{t("ui.general")}</h1>
       </div>
 
       {/* General */}
@@ -204,7 +205,7 @@ export function CompanySettings() {
             )}
           </Field>
           <Field
-            label="Description"
+            label={t("ui.description")}
             hint="Optional description shown in the organization profile."
           >
             <input
