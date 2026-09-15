@@ -57,6 +57,18 @@ export function useAdapterCapabilities(): (type: string) => AdapterCapabilities 
     return map;
   }, [adapters]);
 
-  return (type: string): AdapterCapabilities =>
-    capMap.get(type) ?? KNOWN_DEFAULTS[type] ?? ALL_FALSE;
+  return (type: string): AdapterCapabilities => {
+    const serverCaps = capMap.get(type);
+    const fallback = KNOWN_DEFAULTS[type] ?? ALL_FALSE;
+    if (!serverCaps) return fallback;
+    // hermes_gateway: server image (paperclip-korean:eb9f954) still derives
+    // supportsSkills from listSkills presence and returns false until the
+    // gateway server module is rebuilt. Force-enable on the client so
+    // "에이전트에 추가" is usable immediately; server fix (gateway/index.ts
+    // listSkills/syncSkills) will make the override redundant after image rebuild.
+    if (type === "hermes_gateway") {
+      return { ...serverCaps, supportsSkills: true, supportsInstructionsBundle: true };
+    }
+    return serverCaps;
+  };
 }
