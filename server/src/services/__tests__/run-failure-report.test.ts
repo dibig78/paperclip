@@ -26,7 +26,7 @@ vi.mock("../../config.js", () => ({
   loadConfig: mockLoadConfig,
 }));
 
-import { reportRunFailure } from "../run-failure-report.js";
+import { reportRunFailure, waitForPendingRunFailureReports } from "../run-failure-report.js";
 import { redactSensitiveText, REDACTED_EVENT_VALUE } from "../../redaction.js";
 import { redactCurrentUserText } from "../../log-redaction.js";
 
@@ -421,5 +421,55 @@ describeEmbeddedPostgres("reportRunFailure", () => {
     await freshReportRunFailure(db, secondRun);
 
     expect(mockLoadConfig).toHaveBeenCalledTimes(1);
+  });
+
+  describe("waitForPendingRunFailureReports", () => {
+    function deferredAgentRows() {
+      let resolve!: (rows: Array<{ adapterType: string }>) => void;
+      const promise = new Promise<Array<{ adapterType: string }>>((res) => {
+        resolve = res;
+      });
+      return { promise, resolve };
+    }
+
+    function fakeDb(agentRowsPromise: Promise<Array<{ adapterType: string }>>): Db {
+      return {
+        select: () => ({
+          from: () => ({
+            where: () => agentRowsPromise,
+          }),
+        }),
+      } as unknown as Db;
+    }
+
+    it("resolves at once when no report is in flight", async () => {
+      await expect(waitForPendingRunFailureReports()).resolves.toBeUndefined();
+    });
+
+    it("waits for an unawaited report's database read and Sentry capture before it resolves", async () => {
+      const agentRows = deferredAgentRows();
+      const run = buildRun({ status: "failed", agentId: randomUUID() });
+
+      // Do not await the report — this models the fire-and-forget
+      // `void reportRunFailure(db, run)` call every caller uses.
+      void reportRunFailure(fakeDb(agentRows.promise), run);
+
+      const drain = waitForPendingRunFailureReports(1_000);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(mockCaptureRunFailure).not.toHaveBeenCalled();
+
+      agentRows.resolve([{ adapterType: "claude_managed" }]);
+      await drain;
+
+      expect(mockCaptureRunFailure).toHaveBeenCalledTimes(1);
+    });
+
+    it("gives up after the bound and does not throw when a report never settles", async () => {
+      const run = buildRun({ status: "failed", agentId: randomUUID() });
+      void reportRunFailure(fakeDb(new Promise(() => undefined)), run);
+
+      await expect(waitForPendingRunFailureReports(20)).resolves.toBeUndefined();
+      expect(mockCaptureRunFailure).not.toHaveBeenCalled();
+    });
   });
 });
