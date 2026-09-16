@@ -15,8 +15,12 @@ import { builtInAgentsApi, type BuiltInAgentState } from "@/api/builtInAgents";
 import { instanceSettingsApi } from "@/api/instanceSettings";
 import { summarySlotsApi, type SummarySlotSelector } from "@/api/summarySlots";
 import { MarkdownBody } from "@/components/MarkdownBody";
-import { ConfigureBuiltInAgentModal } from "@/components/ConfigureBuiltInAgentModal";
 import { InlineBanner } from "@/components/InlineBanner";
+import { lazy, Suspense } from "react";
+
+const ConfigureBuiltInAgentModal = lazy(() =>
+  import("@/components/ConfigureBuiltInAgentModal").then((m) => ({ default: m.ConfigureBuiltInAgentModal })),
+);
 import { useSummaryDraftStream } from "@/components/useSummaryDraftStream";
 import { useCompanyLiveEvent } from "@/context/LiveUpdatesProvider";
 import { Badge } from "@/components/ui/badge";
@@ -321,13 +325,15 @@ export function SummarySlotCard({
             )}
           </div>
           {companyId ? (
-            <ConfigureBuiltInAgentModal
-              companyId={companyId}
-              state={needsSetup}
-              open={configureOpen}
-              onOpenChange={setConfigureOpen}
-              onConfigured={() => setActionError(null)}
-            />
+            <Suspense fallback={null}>
+              <ConfigureBuiltInAgentModal
+                companyId={companyId}
+                state={needsSetup}
+                open={configureOpen}
+                onOpenChange={setConfigureOpen}
+                onConfigured={() => setActionError(null)}
+              />
+            </Suspense>
           ) : null}
         </>
       ) : null}
