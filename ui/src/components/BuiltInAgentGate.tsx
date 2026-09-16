@@ -7,7 +7,11 @@ import { EmptyState } from "@/components/EmptyState";
 import { InlineBanner } from "@/components/InlineBanner";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { Button } from "@/components/ui/button";
-import { ConfigureBuiltInAgentModal } from "@/components/ConfigureBuiltInAgentModal";
+import { lazy, Suspense } from "react";
+
+const ConfigureBuiltInAgentModal = lazy(() =>
+  import("@/components/ConfigureBuiltInAgentModal").then((m) => ({ default: m.ConfigureBuiltInAgentModal })),
+);
 import { builtInAgentsApi, type BuiltInAgentState } from "@/api/builtInAgents";
 import { agentsApi } from "@/api/agents";
 import { instanceSettingsApi } from "@/api/instanceSettings";
@@ -76,12 +80,14 @@ export function BuiltInAgentGate({ agentKey, companyId, featureLabel, children }
           onAction={() => setConfigureOpen(true)}
           hideActionIcon
         />
-        <ConfigureBuiltInAgentModal
-          companyId={companyId}
-          state={state}
-          open={configureOpen}
-          onOpenChange={setConfigureOpen}
-        />
+        <Suspense fallback={null}>
+          <ConfigureBuiltInAgentModal
+            companyId={companyId}
+            state={state}
+            open={configureOpen}
+            onOpenChange={setConfigureOpen}
+          />
+        </Suspense>
       </>
     );
   }
