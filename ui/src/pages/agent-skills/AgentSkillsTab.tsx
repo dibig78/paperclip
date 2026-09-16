@@ -67,6 +67,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
   const [versionPins, setVersionPins] = useState<Record<string, string>>({});
   const versionPinsRef = useRef<Record<string, string>>({});
   const [search, setSearch] = useState("");
+  const [skillCategory, setSkillCategory] = useState<string>("all");
   const [detectedOpen, setDetectedOpen] = useState(false);
   const lastSavedSkillsRef = useRef<string[]>([]);
   const hasHydratedSkillSnapshotRef = useRef(false);
@@ -294,8 +295,8 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
     [companySkillByKey, skillDraft],
   );
 
-  const filteredEnabled = useMemo(() => filterAgentSkills(enabledRows, search), [enabledRows, search]);
-  const filteredAvailable = useMemo(() => filterAgentSkills(availableRows, search), [availableRows, search]);
+  const filteredEnabled = useMemo(() => filterAgentSkills(enabledRows.filter((r) => skillCategory === "all" || (r.categories ?? []).includes(skillCategory)), search), [enabledRows, search, skillCategory]);
+  const filteredAvailable = useMemo(() => filterAgentSkills(availableRows.filter((r) => skillCategory === "all" || (r.categories ?? []).includes(skillCategory)), search), [availableRows, search, skillCategory]);
   const filteredDetected = useMemo(() => filterAgentSkills(detectedRows, search), [detectedRows, search]);
 
   const applicationLabel = useMemo(() => {
@@ -430,6 +431,16 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
             error={syncSkills.isError && hasUnsavedChanges}
           />
           <div className="ml-auto flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <select value={skillCategory} onChange={(e) => setSkillCategory(e.target.value)} className="h-8 rounded-md border border-input bg-background px-2 text-sm" aria-label={t("ui.filter_by_category")}>
+              <option value="all">{t("ui.all_categories")}</option>
+              {Array.from(new Set(libraryRows.flatMap((r) => r.categories ?? []))).sort().map((c) => (<option key={c} value={c}>{c}</option>))}
+            </select>
+            <Button variant="outline" size="sm" className="shrink-0" onClick={() => setSkillDraft(Array.from(new Set([...skillDraft, ...availableRows.filter((r) => skillCategory === "all" || (r.categories ?? []).includes(skillCategory)).map((r) => r.key)])))} title={t("ui.skills_bulk_hint")}>
+              {t("ui.bulk_enable_all")}
+            </Button>
+            <Button variant="outline" size="sm" className="shrink-0" onClick={() => setSkillDraft(skillDraft.filter((k) => !availableRows.filter((r) => skillCategory === "all" || (r.categories ?? []).includes(skillCategory)).some((r) => r.key === k)))}>
+              {t("ui.bulk_disable_all")}
+            </Button>
             <div className="relative w-full sm:w-auto">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input

@@ -481,7 +481,20 @@
     "agent_skills_no_library_hint": "스킬을 조직에 설치한 뒤 이 에이전트에서 활성화하세요.",
     "agent_skills_adapter_label": "어댑터:",
     "agent_skills_remove": "제거",
-    "agent_skills_enabled_count": "{{enabled}} / {{total}} 활성화됨"
+    "agent_skills_enabled_count": "{{enabled}} / {{total}} 활성화됨",
+    "agent_export": "내보내기",
+    "agent_import": "가져오기",
+    "hermes_gateway_health": "Hermes Gateway 연결 상태",
+    "hermes_gateway_connected": "연결됨",
+    "hermes_gateway_disconnected": "연결 안 됨",
+    "bulk_enable_all": "모두 활성화",
+    "bulk_disable_all": "모두 비활성화",
+    "filter_by_category": "카테고리 필터",
+    "all_categories": "모든 카테고리",
+    "skills_bulk_hint": "필터된 스킬을 일괄 적용합니다",
+    "mcp_status": "MCP 상태",
+    "mcp_env_vars": "환경 변수",
+    "mcp_test": "연결 테스트"
   },
   "status": {
     "backlog": "백로그",

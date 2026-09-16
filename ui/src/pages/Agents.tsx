@@ -38,6 +38,7 @@ import {
 import { usePublishSharedQueryData, useSharedPollingQuery } from "../hooks/useSharedPolling";
 
 import { getAdapterLabel } from "../adapters/adapter-display-registry";
+import { adaptersApi } from "../api/adapters";
 
 const roleLabels = AGENT_ROLE_LABELS as Record<string, string>;
 
@@ -284,6 +285,16 @@ export function Agents({ initialView = "list" }: { initialView?: AgentsView } = 
   const membershipsQuery = useResourceMemberships(selectedCompanyId);
   const membershipMutation = useResourceMembershipMutation(selectedCompanyId);
 
+  // Hermes Gateway health — lightweight, reused for add-agent advanced badge
+  const { data: adapterList } = useQuery({
+    queryKey: ["adapters", "list", selectedCompanyId],
+    queryFn: () => adaptersApi.list(),
+    enabled: Boolean(selectedCompanyId),
+    staleTime: 30_000,
+  });
+  const hermesGatewayInfo = (adapterList ?? []).find((a) => a.type === "hermes_gateway") ?? null;
+  const hermesHealthLabel = !adapterList ? null : hermesGatewayInfo ? (hermesGatewayInfo.loaded ? "connected" : "disconnected") : "disconnected";
+
   // Map agentId -> first live run + live run count
   const liveRunByAgent = useMemo(() => {
     const map = new Map<string, { runId: string; liveCount: number }>();
@@ -516,9 +527,30 @@ export function Agents({ initialView = "list" }: { initialView?: AgentsView } = 
                 <Network className="h-3.5 w-3.5" />
               </Button>
           </div> : null}
+          {hermesGatewayInfo ? (
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/30 px-2.5 py-1 text-xs text-muted-foreground" title={hermesGatewayInfo.label}>
+              <span className={"h-2 w-2 rounded-full " + (hermesGatewayInfo.loaded ? "bg-emerald-500" : "bg-amber-500")} />
+              {hermesGatewayInfo.loaded ? t("ui.hermes_gateway_connected") : t("ui.hermes_gateway_disconnected")}
+            </span>
+          ) : null}
+          <Button size="sm" variant="outline" onClick={() => {
+            const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), agents: (typeof agents !== 'undefined' ? agents : []) }, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url; a.download = "paperclip-agents.json"; a.click(); URL.revokeObjectURL(url);
+          }} title={t("ui.agent_export")}>
+            {t("ui.agent_export")}
+          </Button>
+          <label className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium cursor-pointer hover:bg-accent hover:text-accent-foreground h-8">
+            {t("ui.agent_import")}
+            <input type="file" accept=".json" className="hidden" onChange={async (e) => {
+              const f = e.target.files?.[0]; if (!f) return;
+              try { const j = JSON.parse(await f.text()); const list = Array.isArray(j) ? j : (j.agents ?? []); alert(t("ui.agent_import") + ": " + list.length + " agents in file — use New Agent to create from template"); } catch { alert("Invalid JSON"); }
+              e.target.value = "";
+            }} />
+          </label>
           <Button size="sm" variant="outline" onClick={openNewAgent}>
             <Plus className="h-3.5 w-3.5 mr-1.5" />
-            New Agent
+            {t("ui.new_agent")}
           </Button>
         </div>
       </div>
