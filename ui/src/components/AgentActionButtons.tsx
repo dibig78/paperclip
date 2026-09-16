@@ -220,6 +220,7 @@ export function AgentActionButtons({
   const { pushToast } = useToastActions();
   const [moreOpen, setMoreOpen] = useState(false);
   const [pauseConfirmOpen, setPauseConfirmOpen] = useState(false);
+  const [terminateConfirmOpen, setTerminateConfirmOpen] = useState(false);
   const pendingNavigationChangesRef = useRef(hasPendingNavigationChanges);
   const beforeNavigateRef = useRef(onBeforeNavigate);
   const agentActionStartedDirtyRef = useRef(false);
@@ -483,7 +484,7 @@ export function AgentActionButtons({
             ) : (
               <Copy className="h-3 w-3" />
             )}
-            Duplicate Agent
+            에이전트 복제
           </button>
           <button
             className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
@@ -512,16 +513,37 @@ export function AgentActionButtons({
               className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50 text-destructive"
               onClick={() => {
                 setMoreOpen(false);
-                if (onTerminateSuccess && !confirmNavigationStart(agentActionStartedDirtyRef)) return;
-                agentAction.mutate("terminate");
+                setTerminateConfirmOpen(true);
               }}
             >
               <Trash2 className="h-3 w-3" />
-              Terminate
+              에이전트 삭제
             </button>
           )}
         </PopoverContent>
       </Popover>
+      <AlertDialog open={terminateConfirmOpen} onOpenChange={setTerminateConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>에이전트를 삭제할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {agent.name} 에이전트를 삭제하면 되돌릴 수 없습니다. 진행 중인 작업과 설정이 함께 삭제됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (onTerminateSuccess && !confirmNavigationStart(agentActionStartedDirtyRef)) return;
+                agentAction.mutate("terminate");
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

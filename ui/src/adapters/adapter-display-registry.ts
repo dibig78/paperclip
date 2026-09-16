@@ -103,9 +103,8 @@ const adapterDisplayMap: Record<string, AdapterDisplayInfo> = {
   },
   hermes_gateway: {
     label: "Hermes Gateway",
-    description: "Remote Hermes API server",
+    description: "원격 Hermes API 서버 — Paperclip에서 직접 스킬·설정을 관리합니다",
     icon: Bot,
-    hideFromVisualSelection: true,
   },
   hermes_local: {
     label: "Hermes",

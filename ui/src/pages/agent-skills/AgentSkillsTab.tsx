@@ -226,7 +226,13 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
     [skillSnapshot],
   );
 
-  const unsupported = skillSnapshot?.mode === "unsupported";
+  const isHermesAdapter = agent.adapterType === "hermes_gateway" || agent.adapterType === "hermes_local";
+  const rawUnsupported = skillSnapshot?.mode === "unsupported";
+  // Hermes Gateway now has listSkills/syncSkills (server image catches up after
+  // redeploy). Hide the "cannot manage yet" banner immediately so Leo's 0/7
+  // actually becomes controllable even while the NAS still serves the old
+  // image's unsupported snapshot.
+  const unsupported = rawUnsupported && !isHermesAdapter;
 
   // Library skills → row models (the store's visual language, tuned for rows).
   const libraryRows = useMemo<AgentSkillRowData[]>(
@@ -293,6 +299,9 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
   const filteredDetected = useMemo(() => filterAgentSkills(detectedRows, search), [detectedRows, search]);
 
   const applicationLabel = useMemo(() => {
+    if (isHermesAdapter && skillSnapshot?.mode === "unsupported") {
+      return t("ui.agent_skills_applied_on_next_run");
+    }
     switch (skillSnapshot?.mode) {
       case "persistent":
         return t("ui.agent_skills_kept_in_workspace");
@@ -303,7 +312,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       default:
         return null;
     }
-  }, [skillSnapshot?.mode]);
+  }, [isHermesAdapter, skillSnapshot?.mode]);
 
   const unsupportedMessage = useMemo(() => {
     if (!unsupported) return null;
